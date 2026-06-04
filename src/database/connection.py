@@ -3,6 +3,7 @@ import psycopg2
 from contextlib import contextmanager
 from typing import Callable
 from dotenv import load_dotenv
+from functools import wraps
 
 load_dotenv()
 
@@ -40,8 +41,10 @@ def db_session():
 def db_connection(func: Callable) -> Callable:
     """Decorator that injects a db connection as first argument."""
 
+    @wraps(func)
     def wrapper(*args, **kwargs):
-        with db_session() as db:
-            return func(db, *args, **kwargs)
+        with db_session() as conn:
+            with conn.cursor() as cur:
+                return func(cur, *args, **kwargs)
 
     return wrapper
