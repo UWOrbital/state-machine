@@ -7,7 +7,9 @@ class StateMachine:
     Ground station state machine.
     """
 
-    def __init__(self, default_state: StateMachineStates) -> None:
+    def __init__(
+        self, default_state: StateMachineStates = StateMachineStates.DISCONNECTED
+    ) -> None:
         """
         Initialize the state machine and sets the default state and default transitional state
 
