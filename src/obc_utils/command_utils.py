@@ -4,28 +4,30 @@ from pathlib import Path
 from typing import Final
 
 from ax25 import Frame
-from interfaces import (
+from src.interfaces import (
     OBC_UART_BAUD_RATE,
     RS_DECODED_DATA_SIZE,
 )
-from interfaces.obc_gs_interface.commands.python import (
+from src.interfaces.obc_gs_interface.commands.python import (
     CmdCallbackId,
     CmdMsg,
     CmdResponseErrorCode,
 )
-from interfaces.obc_gs_interface.commands.python.command_factories import (
+from src.interfaces.obc_gs_interface.commands.python.command_factories import (
     COMMAND_FACTORIES,
 )
-from interfaces.obc_gs_interface.commands.python.command_framing import (
+from src.interfaces.obc_gs_interface.commands.python.command_framing import (
     command_multi_pack,
 )
-from interfaces.obc_gs_interface.commands.python.command_response_callbacks import (
+from src.interfaces.obc_gs_interface.commands.python.command_response_callbacks import (
     parse_command_response,
 )
-from interfaces.obc_gs_interface.commands.python.command_response_classes import CmdRes
+from src.interfaces.obc_gs_interface.commands.python.command_response_classes import (
+    CmdRes,
+)
 from serial import PARITY_NONE, STOPBITS_TWO, Serial
 
-from obc_utils.encode_decode import CommsPipeline
+from src.obc_utils.encode_decode import CommsPipeline
 
 # This is a constant value set in the python and OBC side as to what length of I Frame the OBC will be waiting to
 # receive. This must be followed or the obc will not function as expected

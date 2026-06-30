@@ -1,5 +1,5 @@
 from ax25 import Frame, FrameType
-from interfaces import (
+from src.interfaces import (
     CUBE_SAT_CALLSIGN,
     GROUND_STATION_CALLSIGN,
     INFO_FIELD_END_POSITION,
@@ -7,9 +7,9 @@ from interfaces import (
     RS_DECODED_DATA_SIZE,
     RS_ENCODED_DATA_SIZE,
 )
-from interfaces.obc_gs_interface.aes128 import AES128
-from interfaces.obc_gs_interface.ax25 import AX25
-from interfaces.obc_gs_interface.fec import FEC
+from src.interfaces.obc_gs_interface.aes128 import AES128
+from src.interfaces.obc_gs_interface.ax25 import AX25
+from src.interfaces.obc_gs_interface.fec import FEC
 
 
 class CommsPipeline:

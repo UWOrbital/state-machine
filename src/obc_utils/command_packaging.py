@@ -7,9 +7,9 @@ from interfaces import (
     RS_DECODED_DATA_SIZE,
     RS_ENCODED_DATA_SIZE,
 )
-from interfaces.obc_gs_interface.aes128 import AES128
-from interfaces.obc_gs_interface.ax25 import AX25
-from interfaces.obc_gs_interface.fec import FEC
+from src.interfaces.obc_gs_interface.aes128 import AES128
+from src.interfaces.obc_gs_interface.ax25 import AX25
+from src.interfaces.obc_gs_interface.fec import FEC
 
 
 class CommandPackaging:
