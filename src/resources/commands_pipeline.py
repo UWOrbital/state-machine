@@ -10,7 +10,7 @@ from interfaces.obc_gs_interface.commands.python import CmdMsg
 from interfaces.obc_gs_interface.commands.python.command_framing import (
     command_multi_pack,
 )
-from obc_utils.command_packaging import CommandPackaging
+from src.interfaces.utils.command_packaging import CommandPackaging
 
 
 class CommandsPipeline:
