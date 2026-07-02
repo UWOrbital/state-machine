@@ -2,15 +2,14 @@ import contextlib
 import warnings
 
 from data.data_wrappers.wrappers import CommandsWrapper, MainCommandWrapper
-from data.enums.transactional import CommandStatus
-from data.resources.cli_commands import CLICommand
-from data.tables.transactional_tables import Commands
-from interfaces import PADDING_REQUIRED
-from interfaces.obc_gs_interface.commands.python import CmdMsg
-from interfaces.obc_gs_interface.commands.python.command_framing import (
+from src.resources.commands import Command, DatabaseCommand
+from src.interfaces import PADDING_REQUIRED
+from src.interfaces.obc_gs_interface.commands.python import CmdMsg
+from src.interfaces.obc_gs_interface.commands.python.command_framing import (
     command_multi_pack,
 )
 from src.interfaces.utils.command_packaging import CommandPackaging
+from src.enums.command_enums import CommandStatus
 
 
 class CommandsPipeline:
@@ -27,7 +26,7 @@ class CommandsPipeline:
         Once lockout is True, commands will no longer be recieved
         """
         self.lockout: bool = False
-        self.commands_queue: list[CLICommand] = []
+        self.commands_queue: list[Command] = []
         self.packet_list: list[bytes] = []
 
     def queue_to_packet(self) -> list[bytes]:
@@ -63,7 +62,7 @@ class CommandsPipeline:
 
         return self.packet_list
 
-    def build_queue(self) -> list[Commands]:
+    def build_queue(self) -> list[DatabaseCommand]:
         """
         Builds the queue from the database based on status.
         """
@@ -93,7 +92,7 @@ class CommandsPipeline:
             main_cmd = MainCommandWrapper().get_by_id(command.type_)
             priority = main_cmd.priority if main_cmd else 0
 
-            cli_command = CLICommand(
+            cli_command = Command(
                 params=processed_param, cmd_id=command.type_, prio=priority
             )
             cli_command.command = command
@@ -106,7 +105,7 @@ class CommandsPipeline:
         self.sort_queue()
         return commands
 
-    def sort_queue(self) -> list[CLICommand]:
+    def sort_queue(self) -> list[Command]:
         """
         This function sorts the queue 2 times. We first sort by time to ensure time descending,
         then we sort by priority to ensure that the highest priority is at the top of the

@@ -5,6 +5,8 @@ from typing import Callable
 from dotenv import load_dotenv
 from functools import wraps
 
+Cursor = psycopg2.extensions.cursor
+
 load_dotenv()
 
 
