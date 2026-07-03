@@ -4,8 +4,13 @@ from contextlib import contextmanager
 from typing import Callable
 from dotenv import load_dotenv
 from functools import wraps
+from typing import Concatenate, ParamSpec, TypeVar
 
 Cursor = psycopg2.extensions.cursor
+
+P = ParamSpec("P")
+
+R = TypeVar("R")
 
 load_dotenv()
 
@@ -40,11 +45,11 @@ def db_session():
         conn.close()
 
 
-def db_connection(func: Callable) -> Callable:
+def db_connection(func: Callable[Concatenate[Cursor, P], R]) -> Callable[P, R]:
     """Decorator that injects a db connection as first argument."""
 
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         with db_session() as conn:
             with conn.cursor() as cur:
                 return func(cur, *args, **kwargs)

@@ -1,7 +1,11 @@
 import contextlib
 import warnings
 
-from data.data_wrappers.wrappers import CommandsWrapper, MainCommandWrapper
+from src.database.crud import (
+    get_all_commands_by_status,
+    get_main_command_by_id,
+    update_command_status,
+)
 from src.resources.commands import Command, DatabaseCommand
 from src.interfaces import PADDING_REQUIRED
 from src.interfaces.obc_gs_interface.commands.python import CmdMsg
@@ -56,9 +60,8 @@ class CommandsPipeline:
             )
 
         for cli_command in self.commands_queue:
-            if cli_command.command is not None:
-                update_req = {"status": CommandStatus.ONGOING}
-                CommandsWrapper().update(cli_command.command.id, update_req)
+            if cli_command.command:
+                update_command_status(cli_command.command.id, CommandStatus.ONGOING)
 
         return self.packet_list
 
@@ -67,10 +70,10 @@ class CommandsPipeline:
         Builds the queue from the database based on status.
         """
 
-        commands = CommandsWrapper().get_all_by(status=CommandStatus.PENDING)
+        db_commands = get_all_commands_by_status(CommandStatus.PENDING)
 
-        for command in commands:
-            param_list = command.params.split(",") if command.params else []
+        for db_command in db_commands:
+            param_list = db_command.params.split(",") if db_command.params else []
             processed_param: dict[str, str | int | bool | float] = {}
 
             for i in range(0, len(param_list) - 1, 2):
@@ -89,21 +92,20 @@ class CommandsPipeline:
 
                 processed_param[param_list[i]] = val
 
-            main_cmd = MainCommandWrapper().get_by_id(command.type_)
+            main_cmd = get_main_command_by_id(db_command.type_)
             priority = main_cmd.priority if main_cmd else 0
 
             cli_command = Command(
-                params=processed_param, cmd_id=command.type_, prio=priority
+                params=processed_param, cmd_id=db_command.type_, prio=priority
             )
-            cli_command.command = command
-            cli_command.time = command.created_at
+            cli_command.command = db_command
+            cli_command.time = db_command.created_at
             self.commands_queue.append(cli_command)
 
-            update_req = {"status": CommandStatus.SCHEDULED}
-            CommandsWrapper().update(cli_command.command.id, update_req)
+            update_command_status(db_command.id, CommandStatus.SCHEDULED)
 
         self.sort_queue()
-        return commands
+        return db_commands
 
     def sort_queue(self) -> list[Command]:
         """
@@ -121,9 +123,8 @@ class CommandsPipeline:
         enum for aborted)
         """
         for cli_command in self.commands_queue:
-            if cli_command.command is not None:
-                update_req = {"status": CommandStatus.COMPLETED}
-                CommandsWrapper().update(cli_command.command.id, update_req)
+            if cli_command.command:
+                update_command_status(cli_command.command.id, CommandStatus.COMPLETED)
 
         self.commands_queue = []
 
