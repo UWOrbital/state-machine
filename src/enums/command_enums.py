@@ -1,6 +1,19 @@
 from enum import StrEnum, auto
 
 
+class SessionStatus(StrEnum):
+    """
+    Represents the possible states that a session can be in
+    """
+
+    PENDING = (
+        auto()
+    )  # Initial state of a session. Optional or can start at SCHEDULED status
+    SCHEDULED = auto()  # Session has been scheduled. GS has not received any data yet but the start time is known
+    ONGOING = auto()  # Session has been started. GS is receiving data
+    COMPLETED = auto()  # Session is complete. GS has received all the data for the session. Final state of session
+
+
 class CommandStatus(StrEnum):
     """
     Represents the possible states that a command can be in

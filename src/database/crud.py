@@ -1,8 +1,30 @@
+from datetime import datetime
 from uuid import UUID
 
 from src.database.connection import Cursor, db_connection
-from src.enums.command_enums import CommandStatus
+from src.enums.command_enums import CommandStatus, SessionStatus
 from src.resources.commands import DatabaseCommand, MainCommand
+
+
+@db_connection
+def get_next_session(cur: Cursor) -> datetime | None:
+    """
+    Returns the start_time of the next upcoming session — the soonest
+    PENDING session with a start_time still in the future. Returns None
+    if no such session exists.
+    """
+    cur.execute(
+        """
+        SELECT start_time
+        FROM transactional.sessions
+        WHERE status = %s AND start_time > now()
+        ORDER BY start_time ASC
+        LIMIT 1
+        """,
+        (SessionStatus.PENDING.value,),
+    )
+    row = cur.fetchone()
+    return row[0] if row is not None else None
 
 
 @db_connection
