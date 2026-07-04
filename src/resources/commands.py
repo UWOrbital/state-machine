@@ -139,7 +139,7 @@ class Command:
                priorities we have. 1 is the highest priority
         :time: tracks the time at which a command has been created
         """
-        self.command: DatabaseCommand | None = None
+        self.db_command: DatabaseCommand | None = None
         self.command_id: CmdCallbackId | None = None
         self.factory_args: list[str | int | bool | float] = []
 

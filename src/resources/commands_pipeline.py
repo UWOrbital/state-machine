@@ -27,7 +27,7 @@ class CommandsPipeline:
     def __init__(self) -> None:
         """
         Lockout should be set at some arbitrary time before session begins.
-        Once lockout is True, commands will no longer be recieved
+        Once lockout is True, commands will no longer be received
         """
         self.lockout: bool = False
         self.commands_queue: list[Command] = []
@@ -59,9 +59,9 @@ class CommandsPipeline:
                 comms.encode_frame(byte_string).ljust(PADDING_REQUIRED, b"\x00")
             )
 
-        for cli_command in self.commands_queue:
-            if cli_command.command:
-                update_command_status(cli_command.command.id, CommandStatus.ONGOING)
+        for command in self.commands_queue:
+            if command.db_command:
+                update_command_status(command.db_command.id, CommandStatus.ONGOING)
 
         return self.packet_list
 
@@ -95,12 +95,12 @@ class CommandsPipeline:
             main_cmd = get_main_command_by_id(db_command.type_)
             priority = main_cmd.priority if main_cmd else 0
 
-            cli_command = Command(
+            command = Command(
                 params=processed_param, cmd_id=db_command.type_, prio=priority
             )
-            cli_command.command = db_command
-            cli_command.time = db_command.created_at
-            self.commands_queue.append(cli_command)
+            command.db_command = db_command
+            command.time = db_command.created_at
+            self.commands_queue.append(command)
 
             update_command_status(db_command.id, CommandStatus.SCHEDULED)
 
@@ -119,12 +119,12 @@ class CommandsPipeline:
 
     def clear_queue(self) -> None:
         """
-        Sets all command status to completed and clears queue (please note that we should have a seperate
+        Sets all command status to completed and clears queue (please note that we should have a separate
         enum for aborted)
         """
-        for cli_command in self.commands_queue:
-            if cli_command.command:
-                update_command_status(cli_command.command.id, CommandStatus.COMPLETED)
+        for command in self.commands_queue:
+            if command.db_command:
+                update_command_status(command.db_command.id, CommandStatus.COMPLETED)
 
         self.commands_queue = []
 
