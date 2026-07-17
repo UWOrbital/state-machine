@@ -88,7 +88,7 @@ class DatabaseCommand:
     Mirrors the `transactional.commands` table. No ORM/session semantics —
     this is just a row container for raw SQL query results.
     """
-
+    session_id: UUID
     id: UUID = field(default_factory=uuid4)
     user_id: UUID | None = None
     status: CommandStatus = CommandStatus.PENDING
@@ -104,7 +104,7 @@ class DatabaseCommand:
     def from_row(cls, row: tuple) -> "DatabaseCommand":
         """
         Build a Commands instance from a raw psycopg2 fetchone/fetchall row.
-        Assumes column order: id, user_id, status, type_, params, created_at, packet_id, sequence_index
+        Assumes column order: id, user_id, status, type_, params, created_at, packet_id, sequence_index, session_id
         """
         return cls(
             id=row[0],
@@ -115,6 +115,7 @@ class DatabaseCommand:
             created_at=row[5],
             packet_id=row[6],
             sequence_index=row[7],
+            session_id=row[8],
         )
 
 

@@ -26,6 +26,25 @@ def get_next_session(cur: Cursor) -> datetime | None:
     row = cur.fetchone()
     return row[0] if row is not None else None
 
+@db_connection
+def get_next_session_id(cur: Cursor) -> UUID | None:
+    """
+    Returns the ID of the next upcoming pending session.
+    """
+    cur.execute(
+        """
+        SELECT id
+        FROM transactional.sessions
+        WHERE status = %s
+          AND start_time > NOW()
+        ORDER BY start_time ASC
+        LIMIT 1
+        """,
+        (SessionStatus.PENDING.value,),
+    )
+
+    row = cur.fetchone()
+    return row[0] if row is not None else None
 
 @db_connection
 def get_main_command_by_id(cur: Cursor, command_id: int) -> MainCommand | None:
@@ -66,6 +85,43 @@ def get_all_commands_by_status(
     rows = cur.fetchall()
     return [DatabaseCommand.from_row(row) for row in rows]
 
+@db_connection
+def get_all_commands_next_session(
+    cur: Cursor,
+    status: CommandStatus,
+) -> list[DatabaseCommand]:
+
+    session_id = get_next_session_id(cur)
+
+    if session_id is None:
+        return []
+
+    cur.execute(
+        """
+        SELECT
+            id,
+            user_id,
+            status,
+            type,
+            params,
+            created_at,
+            packet_id,
+            sequence_index,
+            session_id
+        FROM transactional.commands
+        WHERE session_id = %s
+          AND status = %s
+        """,
+        (
+            session_id,
+            status.value,
+        ),
+    )
+
+    return [
+        DatabaseCommand.from_row(row)
+        for row in cur.fetchall()
+    ]
 
 @db_connection
 def update_command_status(cur: Cursor, command_id: UUID, status: CommandStatus) -> None:
