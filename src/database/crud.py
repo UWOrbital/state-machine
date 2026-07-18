@@ -1,9 +1,9 @@
 from datetime import datetime
 from uuid import UUID
 
-from src.database.connection import Cursor, db_connection
-from src.enums.command_enums import CommandStatus, SessionStatus
-from src.resources.commands import DatabaseCommand, MainCommand
+from database.connection import Cursor, db_connection
+from enums.command_enums import CommandStatus, SessionStatus
+from resources.commands import DatabaseCommand, MainCommand
 
 
 @db_connection
@@ -26,13 +26,59 @@ def get_next_session(cur: Cursor) -> datetime | None:
     row = cur.fetchone()
     return row[0] if row is not None else None
 
+@db_connection
+def get_next_session_id(cur: Cursor) -> UUID | None:
+    """
+    Returns the ID of the next upcoming pending session.
+    """
+    cur.execute(
+        """
+        SELECT id
+        FROM transactional.sessions
+        WHERE status = %s
+          AND start_time > NOW()
+        ORDER BY start_time ASC
+        LIMIT 1
+        """,
+        (SessionStatus.PENDING.value,),
+    )
+
+    row = cur.fetchone()
+    return row[0] if row is not None else None
+
+# TODO: add error handling if start_time is None
+@db_connection
+def update_current_session_status(
+    cur: Cursor,
+    status: SessionStatus,
+    start_time: datetime |  None,
+) -> None:
+    cur.execute(
+        """
+        UPDATE transactional.sessions
+        SET status = %s
+        WHERE id = (
+            SELECT id
+            FROM transactional.sessions
+            WHERE start_time = %s             
+            ORDER BY start_time ASC
+            LIMIT 1
+        )
+        """,
+        (
+            status.value,
+            start_time
+        ),
+    )
 
 @db_connection
-def get_main_command_by_id(cur: Cursor, command_id: int) -> MainCommand | None:
+def get_main_command_by_id(cur: Cursor, command_id: int | None) -> MainCommand | None:
     """
     Replacement for MainCommandWrapper().get_by_id(command.type_).
     Fetches a single row from main.commands.
     """
+    if command_id is None:
+        return None
     cur.execute(
         """
         SELECT id, name, params, format, data_size, total_size, priority
@@ -66,6 +112,43 @@ def get_all_commands_by_status(
     rows = cur.fetchall()
     return [DatabaseCommand.from_row(row) for row in rows]
 
+@db_connection
+def get_all_commands_next_session(
+    cur: Cursor,
+    status: CommandStatus,
+) -> list[DatabaseCommand]:
+
+    session_id = get_next_session_id()
+
+    if session_id is None:
+        return []
+
+    cur.execute(
+        """
+        SELECT
+            id,
+            user_id,
+            status,
+            type_,
+            params,
+            created_at,
+            packet_id,
+            sequence_index,
+            session_id
+        FROM transactional.commands
+        WHERE session_id = %s
+          AND status = %s
+        """,
+        (
+            session_id,
+            status.value,
+        ),
+    )
+
+    return [
+        DatabaseCommand.from_row(row)
+        for row in cur.fetchall()
+    ]
 
 @db_connection
 def update_command_status(cur: Cursor, command_id: UUID, status: CommandStatus) -> None:
@@ -82,3 +165,15 @@ def update_command_status(cur: Cursor, command_id: UUID, status: CommandStatus) 
         """,
         (status.value, command_id),
     )
+
+@db_connection
+def update_command_response(cur:Cursor, command_id: UUID, response: str) -> None:
+    cur.execute(
+    """
+    UPDATE transactional.commands
+    SET response = %s
+    WHERE id = %s
+    """,
+    (response, command_id)
+    )
+
