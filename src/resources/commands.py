@@ -1,12 +1,12 @@
 from datetime import datetime
 from dataclasses import dataclass, field
 from uuid import UUID, uuid4
-from src.interfaces.obc_gs_interface.commands.python import CmdCallbackId
-from src.interfaces.obc_gs_interface.commands.python.command_factories import (
+from interfaces.obc_gs_interface.commands.python import CmdCallbackId
+from interfaces.obc_gs_interface.commands.python.command_factories import (
     COMMAND_FACTORIES,
 )
-from src.enums.command_enums import CommandStatus
-from src.database.utils import DatabaseError
+from enums.command_enums import CommandStatus
+from database.utils import DatabaseError
 
 MainTableID = int
 

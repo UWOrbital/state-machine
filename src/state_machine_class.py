@@ -1,5 +1,5 @@
-from src.enums.state_enums import StateMachineStates
-from src.enums.state_transition_enums import StateTransition
+from enums.state_enums import StateMachineStates
+from enums.state_transition_enums import StateTransition
 
 
 class StateMachine:
