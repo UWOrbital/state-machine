@@ -3,6 +3,7 @@ Ground Station State Machine
 
 Currently, the ground station state machine can pull commands for the immediate next session through the GS database (hosted locally or through azure).
 Limitations include (as of 7/18/2026)
+- Commands with params are NOT supported!
 - Can only send one command per packet currently (fixable)
 - Can not send more than one conn_request without resetting the board (probably fixable)
 

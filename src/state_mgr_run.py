@@ -76,7 +76,7 @@ def main():
             response = send_command(command_string, uart_conn.com_port, 1)
             print(response)
             # Update response and status for each sent command
-            #update_command_status(command.id, CommandStatus.COMPLETED)
+            update_command_status(command.id, CommandStatus.COMPLETED)
             update_command_response(command.id, str(response))
 
         # Send reset command, as we can't send another send_conn_request until the board is reset (Don't know why)
