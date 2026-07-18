@@ -80,6 +80,7 @@ def main():
             update_command_response(command.id, str(response))
 
         # Send reset command, as we can't send another send_conn_request until the board is reset (Don't know why)
+        # We don't want to use this for the actual demo, as it will reset after we send the GNC command or image command. Rev4 seems to be able to work as long as we replug in the USB.
         reset_command = "--command CMD_EXEC_OBC_RESET"
         #response = send_command(reset_command, uart_conn.com_port, 1) 
 
