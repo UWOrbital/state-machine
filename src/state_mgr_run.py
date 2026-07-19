@@ -1,5 +1,5 @@
 from state_machine_class import StateMachine
-from database.crud import get_next_session, update_current_session_status, get_all_commands_next_session, update_command_response, get_main_command_by_id, update_command_status
+from database.crud import get_next_session, update_current_session_status, get_all_commands_next_session, update_command_response, get_main_command_by_id, update_command_status, create_telemetry, clear_telemetry_by_type
 from enums.command_enums import SessionStatus, CommandStatus
 from uart_connection import UartConnection
 from sys import argv
@@ -8,7 +8,9 @@ from interfaces.utils.command_utils import (
     send_command,
     send_conn_request,
 )
-from interfaces.obc_gs_interface.commands.python import CmdCallbackId
+from interfaces.obc_gs_interface.commands.python import CmdCallbackId 
+from interfaces.obc_gs_interface.commands.python.command_response_classes import CmdRes
+
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 import time
@@ -41,9 +43,9 @@ def main():
         # Wait for session
         time_next_session_sec = (next_session - datetime.now(timezone.utc)).total_seconds()
         print(f"Sleeping until next session {time_next_session_sec}s")
+        
         #time.sleep(time_next_session_sec)
-        time.sleep(5)
-
+        time.sleep(10)
         current_session = next_session
         update_current_session_status(SessionStatus.ONGOING, current_session)
          
@@ -73,7 +75,36 @@ def main():
                 print("Command name could not be found in main.commands entry")
                 continue
             command_string = f"--command {main_command.name}"
+            #TODO Edit interfaces/utils/obc_gs_command_utils to have a send_command that bypasses specific CLI formatting
+            print(f"Sending {main_command.name}")
             response = send_command(command_string, uart_conn.com_port, 1)
+               
+            # We do additional handling for CMD_DOWNLINK_TELEM
+            if main_command.name == "CMD_DOWNLINK_TELEM":
+                if response is None:
+                    print("No telemetry response received")
+                    continue
+
+                if isinstance(response, CmdRes):
+                    print(
+                    "Expected telemetry data, but send_command returned CmdRes:",
+                    response,
+                    )
+                    continue
+
+                # If valid telemetry packet, clear previous telemetry of the same id. All telemetry is downlinked every time the command is sent - FIX THIS
+                # Offset by 100 as DB is offset by 100 compared to CmdCallbackId.
+                clear_telemetry_by_type(response[0].id+100)
+                for telem in response:
+                    create_telemetry(
+                    telem.id + 100,
+                    telem.obcTemp,
+                    datetime.fromtimestamp(
+                    telem.timestamp,
+                    tz=timezone.utc,
+                        ),
+                    )
+ 
             print(response)
             # Update response and status for each sent command
             update_command_status(command.id, CommandStatus.COMPLETED)
@@ -88,7 +119,6 @@ def main():
         
         past_session = current_session
         update_current_session_status(SessionStatus.COMPLETED, past_session)
-        time.sleep(100)
 if __name__ == "__main__":
     main()
 
