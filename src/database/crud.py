@@ -1,6 +1,5 @@
-from datetime import datetime
-from uuid import UUID
-
+from datetime import datetime, timezone
+from uuid import UUID, uuid4
 from database.connection import Cursor, db_connection
 from enums.command_enums import CommandStatus, SessionStatus
 from resources.commands import DatabaseCommand, MainCommand
@@ -177,3 +176,57 @@ def update_command_response(cur:Cursor, command_id: UUID, response: str) -> None
     (response, command_id)
     )
 
+@db_connection
+def create_telemetry(
+    cur: Cursor,
+    type_: int,
+    value: object,
+    timestamp: datetime,
+) -> None:
+    """
+    Insert one telemetry value into transactional.telemetry.
+
+    timestamp must be timezone-aware. It is normalized to UTC before insertion.
+    """
+
+    if timestamp.tzinfo is None:
+        raise ValueError("timestamp must be timezone-aware")
+
+    timestamp_utc = timestamp.astimezone(timezone.utc)
+
+    cur.execute(
+        """
+        INSERT INTO transactional.telemetry (
+            id,
+            type_,
+            value,
+            timestamp
+        )
+        VALUES (%s, %s, %s, %s);
+        """,
+        (
+            str(uuid4()),
+            type_,
+            str(value),
+            timestamp_utc,
+        ),
+    )   
+
+@db_connection
+def clear_telemetry_by_type(cur:Cursor, telemetry_type: int) -> int:
+    """
+    Deletes every telemetry row whose type_ matches telemetry_type.
+
+    Returns the number of rows deleted.
+    """
+    cur.execute(
+        """
+        DELETE FROM transactional.telemetry
+        WHERE type_ = %s
+        """,
+        (telemetry_type,),
+        )
+
+    deleted_count = cur.rowcount
+
+    return deleted_count
