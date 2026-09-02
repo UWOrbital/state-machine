@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from serial import Serial, SerialException
 
+
 class UartConnection:
     """Non-interactive UART interface for the MCU board."""
+
     def __init__(
         self,
         com_port: str,
@@ -16,7 +18,7 @@ class UartConnection:
 
         self.serial: Serial | None = None
         self.connection_request_sent = False
-    
+
     def connect_uart(self) -> None:
         """Open the UART port and verify that it is usable."""
 
@@ -52,7 +54,4 @@ class UartConnection:
 
     @property
     def is_connected(self):
-        return (
-            self.serial is not None
-            and self.serial.is_open
-        )
+        return self.serial is not None and self.serial.is_open

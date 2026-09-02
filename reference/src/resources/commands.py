@@ -5,8 +5,8 @@ from interfaces.obc_gs_interface.commands.python import CmdCallbackId
 from interfaces.obc_gs_interface.commands.python.command_factories import (
     COMMAND_FACTORIES,
 )
-from enums.command_enums import CommandStatus
-from database.utils import DatabaseError
+from reference.src.enums.command_enums import CommandStatus
+from reference.src.database.utils import DatabaseError
 
 MainTableID = int
 
@@ -88,6 +88,7 @@ class DatabaseCommand:
     Mirrors the `transactional.commands` table. No ORM/session semantics —
     this is just a row container for raw SQL query results.
     """
+
     session_id: UUID
     id: UUID = field(default_factory=uuid4)
     user_id: UUID | None = None

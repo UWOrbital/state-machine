@@ -88,6 +88,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pystuffing"
+version = "0.0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/85/c5/3b5a23b24c6c488d856a92929f7ea26094efa0f3aeb64d430dbed2fc900e/pyStuffing-0.0.4.tar.gz", hash = "sha256:f70b8430d7299bc5c6bc17e74c50393eeca7e044ea93201f286c02cb9f9a5695", size = 4130, upload-time = "2021-05-13T09:17:38.046Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0f/01/db572e37a75efaa690238d31ce77990247b3e630fdb5615fdc0e11cabf4c/pyStuffing-0.0.4-py3-none-any.whl", hash = "sha256:01263ec30d98216000706df77042950a6d77d0d61a24a2a1c1d491883bc43fc8", size = 4743, upload-time = "2021-05-13T09:17:36.89Z" },
+]
+
+[[package]]
 name = "pytest"
 version = "9.0.3"
 source = { registry = "https://pypi.org/simple" }
@@ -121,6 +133,7 @@ dependencies = [
     { name = "psycopg2" },
     { name = "pyham-ax25" },
     { name = "pyserial" },
+    { name = "pystuffing" },
     { name = "uuid" },
 ]
 
@@ -135,6 +148,7 @@ requires-dist = [
     { name = "psycopg2", specifier = ">=2.9.12" },
     { name = "pyham-ax25", specifier = ">=1.0.3" },
     { name = "pyserial", specifier = ">=3.5" },
+    { name = "pystuffing", specifier = ">=0.0.4" },
     { name = "uuid", specifier = ">=1.30" },
 ]
 

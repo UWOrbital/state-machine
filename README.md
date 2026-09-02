@@ -25,6 +25,6 @@ whenever you stop the program, make sure to replug in the board or press the res
 If confused about any of these instructions, ask AI for guidance
 
 # extra
-there is also a file that can populate the next session with 3 pings (accesses the DB) for testing (stand in for altering the DB in another way - like the GS frontend/backend) 
+there is also a file that can populate the next session with 3 pings (accesses the DB) for testing (stand in for altering the DB in another way - like the GS frontend/backend)
 to run,
 `PYTHONPATH=src python -m database.helpers.populate_next_session`

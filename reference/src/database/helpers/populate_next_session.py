@@ -1,12 +1,13 @@
-from database.connection import Cursor, db_connection
+from reference.src.database.connection import Cursor, db_connection
 from uuid import uuid4
-from database.crud import get_all_commands_next_session
-from enums.command_enums import CommandStatus 
+from reference.src.database.crud import get_all_commands_next_session
+from reference.src.enums.command_enums import CommandStatus
+
 
 @db_connection
-def create_pings_next_session(cur:Cursor) -> None:
+def create_pings_next_session(cur: Cursor) -> None:
     cur.execute(
-                """
+        """
                 SELECT id
                 FROM transactional.sessions
                 WHERE status = 'PENDING'
@@ -23,7 +24,7 @@ def create_pings_next_session(cur:Cursor) -> None:
 
     session_id = session[0]
     cur.execute(
-                """
+        """
                 SELECT id
                 FROM main.commands
                 WHERE name = 'CMD_PING'
@@ -39,18 +40,18 @@ def create_pings_next_session(cur:Cursor) -> None:
     command_type_id = command_type[0]
 
     rows = [
-    (
-        str(uuid4()),          # id
-        "PENDING",             # status
-        command_type_id,       # type_
-        sequence_index,        # sequence_index
-        str(session_id),       # session_id
-    )
-    for sequence_index in range(3)
+        (
+            str(uuid4()),  # id
+            "PENDING",  # status
+            command_type_id,  # type_
+            sequence_index,  # sequence_index
+            str(session_id),  # session_id
+        )
+        for sequence_index in range(3)
     ]
 
     cur.executemany(
-    """
+        """
     INSERT INTO transactional.commands (
         id,
         status,
@@ -60,13 +61,14 @@ def create_pings_next_session(cur:Cursor) -> None:
     )
     VALUES (%s, %s, %s, %s, %s);
     """,
-    rows,
+        rows,
     )
+
 
 @db_connection
 def create_downlink_command_next_session(cur: Cursor) -> None:
     cur.execute(
-                """
+        """
                 SELECT id
                 FROM transactional.sessions
                 WHERE status = 'PENDING'
@@ -83,7 +85,7 @@ def create_downlink_command_next_session(cur: Cursor) -> None:
 
     session_id = session[0]
     cur.execute(
-                """
+        """
                 SELECT id
                 FROM main.commands
                 WHERE name = 'CMD_DOWNLINK_TELEM'
@@ -99,18 +101,18 @@ def create_downlink_command_next_session(cur: Cursor) -> None:
     command_type_id = command_type[0]
 
     rows = [
-    (
-        str(uuid4()),          # id
-        "PENDING",             # status
-        command_type_id,       # type_
-        sequence_index,        # sequence_index
-        str(session_id),       # session_id
-    )
-    for sequence_index in range(1)
+        (
+            str(uuid4()),  # id
+            "PENDING",  # status
+            command_type_id,  # type_
+            sequence_index,  # sequence_index
+            str(session_id),  # session_id
+        )
+        for sequence_index in range(1)
     ]
 
     cur.executemany(
-    """
+        """
     INSERT INTO transactional.commands (
         id,
         status,
@@ -120,8 +122,9 @@ def create_downlink_command_next_session(cur: Cursor) -> None:
     )
     VALUES (%s, %s, %s, %s, %s);
     """,
-    rows,
-    )   
+        rows,
+    )
+
 
 def main() -> None:
     create_pings_next_session()
@@ -131,6 +134,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-
-

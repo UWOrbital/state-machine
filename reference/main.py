@@ -1,8 +1,8 @@
 import time
 from datetime import datetime, timedelta
 
-from src.database.crud import get_next_session
-from src.resources.commands_pipeline import CommandsPipeline
+from reference.src.database.crud import get_next_session
+from reference.src.resources.commands_pipeline import CommandsPipeline
 
 # How long before a session starts we should have commands packed and ready.
 PRE_SESSION_LEAD_TIME = timedelta(minutes=5)
