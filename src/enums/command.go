@@ -3,13 +3,13 @@ package enums
 type CommandStatus int
 
 const (
-	CommandPending CommandStatus = iota
-	CommandScheduled
-	CommandOngoing
-	Cancelled
-	Failed
-	CommandCompleted
-	CommandEnumError
+	commandPending CommandStatus = iota
+	commandScheduled
+	commandOngoing
+	commandCancelled
+	commandFailed
+	commandCompleted
+	commandEnumError
 )
 
 var commandStatusStrs = [...]string{
@@ -22,6 +22,24 @@ var commandStatusStrs = [...]string{
 	"ENUM_ERROR",
 }
 
+var CommandStatuses = struct {
+	Pending   CommandStatus
+	Scheduled CommandStatus
+	Ongoing   CommandStatus
+	Cancelled CommandStatus
+	Failed    CommandStatus
+	Completed CommandStatus
+	EnumError CommandStatus
+}{
+	Pending:   commandPending,
+	Scheduled: commandScheduled,
+	Ongoing:   commandOngoing,
+	Cancelled: commandCancelled,
+	Failed:    commandFailed,
+	Completed: commandCompleted,
+	EnumError: commandEnumError,
+}
+
 var commandStatusMap = make(map[string]CommandStatus)
 
 func init() {
@@ -32,7 +50,7 @@ func init() {
 
 func (cs CommandStatus) String() string {
 	if cs < 0 || int(cs) >= len(sessionStatusStrs) {
-		cs = CommandEnumError
+		cs = commandEnumError
 	}
 	return commandStatusStrs[cs]
 }
@@ -40,7 +58,7 @@ func (cs CommandStatus) String() string {
 func ParseCommandStatus(str string) CommandStatus {
 	cs, ok := commandStatusMap[str]
 	if !ok {
-		return CommandEnumError
+		return commandEnumError
 	}
 	return cs
 }

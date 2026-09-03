@@ -4,22 +4,22 @@ type MachineState int
 
 const (
 	// UPLINK STATES
-	Disconnected MachineState = iota
-	AttemptingConnection
-	AwaitingAck
-	Uplinking
-	Downlinking
+	machineStateDisconnected MachineState = iota
+	machineStateAttemptingConnection
+	machineStateAwaitingAck
+	machineStateUplinking
+	machineStateDownlinking
 
 	// DISCONNECT STATES
-	AwaitingDisconnect
-	SendDisconnectAck
+	machineStateAwaitingDisconnect
+	machineStateSendDisconnectAck
 
 	// EMERGENCY STATES
-	EnteringEmergency
-	AwaitingConnection
-	SendConnectionAck
-	EmergencyUplink
-	ServerSideError
+	machineStateEnteringEmergency
+	machineStateAwaitingConnection
+	machineStateSendConnectionAck
+	machineStateEmergencyUplink
+	machineStateServerSideError
 )
 
 var machineStateStrs = [...]string{
@@ -42,6 +42,41 @@ var machineStateStrs = [...]string{
 	"SERVER_SIDE_ERROR",
 }
 
+var MachineStates = struct {
+	// UPLINK STATES
+	Disconnected         MachineState
+	AttemptingConnection MachineState
+	AwaitingAck          MachineState
+	Uplinking            MachineState
+	Downlinking          MachineState
+
+	// DISCONNECT STATES
+	AwaitingDisconnect MachineState
+	SendDisconnectAck  MachineState
+
+	// EMERGENCY STATES
+	EnteringEmergency  MachineState
+	AwaitingConnection MachineState
+	SendConnectionAck  MachineState
+	EmergencyUplink    MachineState
+	ServerSideError    MachineState
+}{
+	Disconnected:         machineStateDisconnected,
+	AttemptingConnection: machineStateAttemptingConnection,
+	AwaitingAck:          machineStateAwaitingAck,
+	Uplinking:            machineStateUplinking,
+	Downlinking:          machineStateDownlinking,
+
+	AwaitingDisconnect: machineStateAwaitingDisconnect,
+	SendDisconnectAck:  machineStateSendDisconnectAck,
+
+	EnteringEmergency:  machineStateEnteringEmergency,
+	AwaitingConnection: machineStateAwaitingConnection,
+	SendConnectionAck:  machineStateSendConnectionAck,
+	EmergencyUplink:    machineStateEmergencyUplink,
+	ServerSideError:    machineStateServerSideError,
+}
+
 var machineStateMap = make(map[string]MachineState)
 
 func init() {
@@ -52,7 +87,7 @@ func init() {
 
 func (ms MachineState) String() string {
 	if ms < 0 || int(ms) >= len(machineStateStrs) {
-		ms = ServerSideError
+		ms = machineStateServerSideError
 	}
 	return machineStateStrs[ms]
 }
@@ -60,7 +95,7 @@ func (ms MachineState) String() string {
 func ParseMachineState(str string) MachineState {
 	ms, ok := machineStateMap[str]
 	if !ok {
-		return ServerSideError
+		return machineStateServerSideError
 	}
 	return ms
 }

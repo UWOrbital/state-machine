@@ -4,29 +4,29 @@ type TransitionState int
 
 const (
 	// TODO: rename / clarify the specific transition states
-	Error TransitionState = iota
+	transitionStateError TransitionState = iota
 
 	// UPLINK TRANSITION STATES
-	BeginUplink
-	ConnectionEstablished
-	AckReceived
+	transitionStateBeginUplink
+	transitionStateConnectionEstablished
+	transitionStateAckReceived
 
 	// UPLINK / DOWNLINK TRANSITION STATES
-	UplinkFinished
-	DownlinkingFinished
+	transitionStateUplinkFinished
+	transitionStateDownlinkingFinished
 
 	// DISCONNECT TRANSITION STATES
-	Disconnecting
-	DisconnectCMDReceived
-	DisconnectComplete
+	transitionStateDisconnecting
+	transitionStateDisconnectCMDReceived
+	transitionStateDisconnectComplete
 
 	// EMERGENCY TRANSITION STATES
-	EnterEmergency
-	EmergencyInitiated
-	ConnectionReceived
-	ConnectionAckSent
-	EmergencyUplinkFinished
-	NoTransitionTriggered // NOT USED IN STATE MACHINE
+	transitionStateEnterEmergency
+	transitionStateEmergencyInitiated
+	transitionStateConnectionReceived
+	transitionStateConnectionAckSent
+	transitionStateEmergencyUplinkFinished
+	transitionStateNoTransitionTriggered // NOT USED IN STATE MACHINE
 )
 
 var transitionStateStrs = [...]string{
@@ -56,6 +56,48 @@ var transitionStateStrs = [...]string{
 	"NO_TRANSITION_TRIGGERED", // NOT USED IN STATE MACHINE
 }
 
+var TransitionStates = struct {
+	Error TransitionState
+
+	BeginUplink           TransitionState
+	ConnectionEstablished TransitionState
+	AckReceived           TransitionState
+
+	UplinkFinished      TransitionState
+	DownlinkingFinished TransitionState
+
+	Disconnecting         TransitionState
+	DisconnectCMDReceived TransitionState
+	DisconnectComplete    TransitionState
+
+	EnterEmergency          TransitionState
+	EmergencyInitiated      TransitionState
+	ConnectionReceived      TransitionState
+	ConnectionAckSent       TransitionState
+	EmergencyUplinkFinished TransitionState
+	NoTransitionTriggered   TransitionState
+}{
+	Error: transitionStateError,
+
+	BeginUplink:           transitionStateBeginUplink,
+	ConnectionEstablished: transitionStateConnectionEstablished,
+	AckReceived:           transitionStateAckReceived,
+
+	UplinkFinished:      transitionStateUplinkFinished,
+	DownlinkingFinished: transitionStateDownlinkingFinished,
+
+	Disconnecting:         transitionStateDisconnecting,
+	DisconnectCMDReceived: transitionStateDisconnectCMDReceived,
+	DisconnectComplete:    transitionStateDisconnectComplete,
+
+	EnterEmergency:          transitionStateEnterEmergency,
+	EmergencyInitiated:      transitionStateEmergencyInitiated,
+	ConnectionReceived:      transitionStateConnectionReceived,
+	ConnectionAckSent:       transitionStateConnectionAckSent,
+	EmergencyUplinkFinished: transitionStateEmergencyUplinkFinished,
+	NoTransitionTriggered:   transitionStateNoTransitionTriggered,
+}
+
 var transitionStateMap = make(map[string]TransitionState)
 
 func init() {
@@ -66,7 +108,7 @@ func init() {
 
 func (ts TransitionState) String() string {
 	if ts < 0 || int(ts) >= len(machineStateStrs) {
-		ts = Error
+		ts = transitionStateError
 	}
 	return machineStateStrs[ts]
 }
@@ -74,7 +116,7 @@ func (ts TransitionState) String() string {
 func ParseTransitionState(str string) TransitionState {
 	ts, ok := transitionStateMap[str]
 	if !ok {
-		return Error
+		return transitionStateError
 	}
 	return ts
 }
