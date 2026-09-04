@@ -9,6 +9,7 @@ dependencies = [
     "psycopg2>=2.9.12",
     "pyham-ax25>=1.0.3",
     "pyserial>=3.5",
+    "pystuffing>=0.0.4",
     "uuid>=1.30",
 ]
 

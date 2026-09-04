@@ -1,19 +1,19 @@
 import contextlib
 import warnings
 
-from database.crud import (
+from reference.src.database.crud import (
     get_all_commands_by_status,
     get_main_command_by_id,
     update_command_status,
 )
-from resources.commands import Command, DatabaseCommand
+from reference.src.resources.commands import Command, DatabaseCommand
 from interfaces import PADDING_REQUIRED
 from interfaces.obc_gs_interface.commands.python import CmdMsg
 from interfaces.obc_gs_interface.commands.python.command_framing import (
     command_multi_pack,
 )
 from interfaces.utils.command_packaging import CommandPackaging
-from enums.command_enums import CommandStatus
+from reference.src.enums.command_enums import CommandStatus
 
 
 class CommandsPipeline:
