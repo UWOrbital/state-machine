@@ -101,16 +101,16 @@ var TransitionStates = struct {
 var transitionStateMap = make(map[string]TransitionState)
 
 func init() {
-	for i, str := range machineStateStrs {
+	for i, str := range transitionStateStrs {
 		transitionStateMap[str] = TransitionState(i)
 	}
 }
 
 func (ts TransitionState) String() string {
-	if ts < 0 || int(ts) >= len(machineStateStrs) {
+	if ts < 0 || int(ts) >= len(transitionStateStrs) {
 		ts = transitionStateError
 	}
-	return machineStateStrs[ts]
+	return transitionStateStrs[ts]
 }
 
 func ParseTransitionState(str string) TransitionState {

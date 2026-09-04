@@ -49,7 +49,7 @@ func init() {
 }
 
 func (cs CommandStatus) String() string {
-	if cs < 0 || int(cs) >= len(sessionStatusStrs) {
+	if cs < 0 || int(cs) >= len(commandStatusStrs) {
 		cs = commandEnumError
 	}
 	return commandStatusStrs[cs]

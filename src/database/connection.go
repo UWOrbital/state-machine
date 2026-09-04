@@ -7,9 +7,13 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"state-machine/src/database/gen"
 )
 
 var pool *pgxpool.Pool
+
+var queries *gen.Queries
 
 func getenv(key string) string {
 	val := os.Getenv(key)
@@ -37,7 +41,17 @@ func InitDB(ctx context.Context) error {
 		return fmt.Errorf("failed to create db pool: %w", err)
 	}
 	pool = p
+	queries = gen.New(p)
 	return nil
+}
+
+// Queries returns the sqlc-generated query set bound to the pool.
+// InitDB must have been called first.
+func Queries() *gen.Queries {
+	if queries == nil {
+		panic("database: InitDB must be called before using the database")
+	}
+	return queries
 }
 
 // Close shuts down the pool. Call at shutdown.
@@ -45,6 +59,7 @@ func Close() {
 	if pool != nil {
 		pool.Close()
 	}
+	pool, queries = nil, nil
 }
 
 // WithTx runs fn inside a transaction, committing on success
